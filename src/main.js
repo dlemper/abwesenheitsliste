@@ -1,12 +1,14 @@
 import Vue from 'vue';
+import Buefy from 'buefy';
 import App from './App.vue';
 import router from './router';
 import store from './store';
 import './registerServiceWorker';
-import Buefy from 'buefy'
-import './assets/scss/app.scss'
+import './assets/scss/app.scss';
 
-Vue.use(Buefy)
+Vue.use(Buefy, {
+  defaultIconPack: 'fas',
+});
 
 Vue.config.productionTip = false;
 
