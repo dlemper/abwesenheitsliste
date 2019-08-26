@@ -12,8 +12,10 @@
       <template slot="end">
         <b-navbar-item tag="div">
           <div class="buttons">
-            <a class="button is-light">Upload</a>
-            <a class="button is-light">Download</a>
+            <b-upload v-model="files">
+              <b-button type="is-light">Upload</b-button>
+            </b-upload>
+            <b-button type="is-light">Download</b-button>
           </div>
         </b-navbar-item>
       </template>
@@ -122,97 +124,17 @@
         </template>
       </b-table>
     </div>
-    <b-modal :active.sync="isAddPersonModalActive" has-modal-card>
-      <div class="modal-card" style="width: auto">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Person hinzufügen</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field label="Vorname">
-            <b-input type="text" :value="vorname" placeholder="Erika" required />
-          </b-field>
-
-          <b-field label="Nachname">
-            <b-input type="text" :value="nachname" placeholder="Mustermann" required />
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isAddPersonModalActive = false">
-            Abbrechen
-          </button>
-          <button class="button is-primary" @click="isAddPersonModalActive = false">
-            Speichern
-          </button>
-        </footer>
-      </div>
+    <b-modal :active="isAddPersonModalActive" has-modal-card>
+      <add-person-modal @save="addPerson" @close="isAddPersonModalActive = false" />
     </b-modal>
-    <b-modal :active.sync="isAddAbwModalActive" has-modal-card>
-      <div class="modal-card" style="width: auto">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Abwesenheit hinzufügen</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field label="Art">
-            <b-select v-model="neueAbwesenheit.art" required>
-              <option value="krank">Krank</option>
-              <option value="krankMitKind">Krank mit Kind</option>
-            </b-select>
-          </b-field>
-
-          <b-field label="Zeitraum">
-            <b-datepicker v-model="neueAbwesenheit.zeitraum" range inline required />
-          </b-field>
-
-          <!--<b-field label="Nachname">
-            <b-input type="text" :value="nachname" placeholder="Mustermann" required />
-          </b-field>-->
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isAddAbwModalActive = false">
-            Abbrechen
-          </button>
-          <button class="button is-primary" @click="isAddAbwModalActive = false">
-            Speichern
-          </button>
-        </footer>
-      </div>
+    <b-modal :active="isAddAbwModalActive" has-modal-card>
+      <add-abwesenheit-modal @save="addAbwesenheit" @close="isAddAbwModalActive = false" />
     </b-modal>
-    <b-modal :active.sync="isDeletePersonModalActive" has-modal-card>
-      <div class="modal-card" style="width: auto">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{ vorname }} {{ nachname}} löschen?</p>
-        </header>
-        <section class="modal-card-body">
-          Wollen Sie {{ vorname }} {{ nachname}} wirklich löschen?
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isDeletePersonModalActive = false">
-            Abbrechen
-          </button>
-          <button class="button is-danger" @click="isDeletePersonModalActive = false">
-            Löschen
-          </button>
-        </footer>
-      </div>
+    <b-modal :active="isDeletePersonModalActive" has-modal-card>
+      <delete-person-modal @save="deletePerson" @close="isDeletePersonModalActive = false" />
     </b-modal>
-    <b-modal :active.sync="isDeleteAbwModalActive" has-modal-card>
-      <div class="modal-card" style="width: auto">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Abwesenheit {{ von | date }} - {{ bis | date}} löschen?</p>
-        </header>
-        <section class="modal-card-body">
-          Wollen Sie Abwesenheit {{ art === 'krank' ? 'Krank' : 'Krank mit Kind' }}
-          {{ von | date }} - {{ bis | date }} wirklich löschen?
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isDeleteAbwModalActive = false">
-            Abbrechen
-          </button>
-          <button class="button is-danger" @click="isDeleteAbwModalActive = false">
-            Löschen
-          </button>
-        </footer>
-      </div>
+    <b-modal :active="isDeleteAbwModalActive" has-modal-card>
+      <delete-abwesenheit-modal @save="deleteAbwesenheit" @close="isDeleteAbwModalActive = false" />
     </b-modal>
   </div>
 </template>
@@ -224,17 +146,24 @@ import {
   lightFormat,
   isWeekend,
 } from 'date-fns';
-// import HelloWorld from './components/HelloWorld.vue';
+import AddPersonModal from './components/AddPersonModal.vue';
+import AddAbwesenheitModal from './components/AddAbwesenheitModal.vue';
+import DeletePersonModal from './components/DeletePersonModal.vue';
+import DeleteAbwesenheitModal from './components/DeleteAbwesenheitModal.vue';
 
 const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'app',
   components: {
-    // HelloWorld,
+    AddPersonModal,
+    AddAbwesenheitModal,
+    DeletePersonModal,
+    DeleteAbwesenheitModal,
   },
   data() {
     return {
+      files: {},
       isAddPersonModalActive: false,
       isAddAbwModalActive: false,
       isDeleteAbwModalActive: false,
@@ -276,9 +205,17 @@ export default {
   methods: {
     addAbwesenheit(person, abwesenheit) {
       person.abwesenheiten.push(abwesenheit);
+      this.isAddAbwModalActive = false;
     },
     addPerson(person) {
-      this.personen.push(person);
+      this.personen.push(Object.assign({ abwesenheiten: [] }, person));
+      this.isAddPersonModalActive = false;
+    },
+    deletePerson(person) {
+      this.isDeletePersonModalActive = false;
+    },
+    deleteAbwesenheit(person, abwesenheit) {
+      this.isDeleteAbwModalActive = false;
     },
     anzahlAbwesenheitstage(abwesenheiten) {
       return abwesenheiten
