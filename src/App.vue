@@ -162,35 +162,7 @@ export default {
       neueAbwesenheit: { art: 'krank' },
       bundesland: 'NI',
       feiertage: [],
-      personen: [
-        {
-          nachname: 'Lemper',
-          vorname: 'Daniel',
-          abwesenheiten: [
-            {
-              von: '2019-07-21',
-              bis: '2019-08-02',
-              art: 'krank',
-            },
-          ],
-        },
-        {
-          nachname: 'Lemper',
-          vorname: 'Katharina',
-          abwesenheiten: [
-            {
-              von: '2019-01-01',
-              bis: '2019-01-03',
-              art: 'krankMitKind',
-            },
-            {
-              von: '2019-12-24',
-              bis: '2019-12-30',
-              art: 'krankMitKind',
-            },
-          ],
-        },
-      ],
+      personen: [],
     };
   },
   methods: {
