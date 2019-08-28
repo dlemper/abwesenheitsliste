@@ -12,12 +12,15 @@
       </template>-->
 
       <template slot="end">
+        <b-navbar-item href="https://github.com/dlemper/abwesenheitsliste">
+          <b-icon pack="fab" icon="github" />
+        </b-navbar-item>
         <b-navbar-item tag="div">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Coat_of_arms_of_Lower_Saxony.svg/26px-Coat_of_arms_of_Lower_Saxony.svg.png">
         </b-navbar-item>
         <b-navbar-item tag="div">
           <div class="buttons">
-            <b-upload v-model="files">
+            <b-upload @input="upload">
               <a class="button is-light">
                 <b-icon icon="upload" size="is-small" />
                 <span>Upload</span>
@@ -153,7 +156,6 @@ export default {
   name: 'app',
   data() {
     return {
-      files: {},
       neueAbwesenheit: { art: 'krank' },
       bundesland: 'NI',
       feiertage: [],
@@ -266,6 +268,17 @@ export default {
           personen: this.personen,
         }),
       );
+    },
+    upload(file) {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const data = JSON.parse(event.target.result);
+        this.personen = data.personen;
+        this.bundesland = data.bundesland;
+      };
+
+      reader.readAsText(file);
     },
   },
   mounted() {
