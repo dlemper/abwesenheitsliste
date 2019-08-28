@@ -41,32 +41,19 @@
         ref="table"
       >
         <template slot-scope="props">
-          <b-table-column
-            field="nachname"
-            label="Nachname"
-            width="300"
-            sortable
-          >
+          <b-table-column field="nachname" label="Nachname" sortable>
             <template>{{ props.row.nachname }}</template>
           </b-table-column>
 
-          <b-table-column
-            field="vorname"
-            label="Vorname"
-            sortable
-          >{{ props.row.vorname }}</b-table-column>
+          <b-table-column field="vorname" label="Vorname" sortable>
+            {{ props.row.vorname }}
+          </b-table-column>
 
-          <b-table-column
-            label="Krank"
-            centered
-          >
+          <b-table-column label="Krank" numeric centered>
             {{ anzahlAbwesenheitstage(props.row.abwesenheiten) }}
           </b-table-column>
 
-          <b-table-column
-            label="Krank mit Kind"
-            centered
-          >
+          <b-table-column label="Krank mit Kind" numeric centered>
             {{ anzahlKrankMitKind(props.row.abwesenheiten) }}
           </b-table-column>
 
@@ -134,6 +121,14 @@
               </div>
             </td>
           </tr>
+        </template>
+
+        <template slot="empty">
+          <section class="section">
+            <div class="content has-text-grey has-text-centered">
+              <p>Keine Abwesenheiten eingetragen.</p>
+            </div>
+          </section>
         </template>
       </b-table>
     </div>
