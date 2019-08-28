@@ -35,10 +35,14 @@ export default {
         abwesenheiten: [],
       }),
     },
+    index: {
+      type: Number,
+      default: () => -1,
+    },
   },
   methods: {
     save() {
-      this.$emit('save', this.person);
+      this.$emit('save', this.person, this.index);
       this.$parent.close();
     },
   },

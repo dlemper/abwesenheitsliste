@@ -183,11 +183,19 @@ export default {
     };
   },
   methods: {
-    addAbwesenheit(person, abwesenheit) {
-      person.abwesenheiten.push(abwesenheit);
+    addAbwesenheit(person, abwesenheit, index) {
+      if (index === -1) {
+        person.abwesenheiten.push(abwesenheit);
+      } else {
+        person.abwesenheiten[index] = abwesenheit;
+      }
     },
-    addPerson(person) { // "old values??"
-      this.personen.push(Object.assign({ abwesenheiten: [] }, person));
+    addPerson(person, index) {
+      if (index === -1) {
+        this.personen.push(Object.assign({ abwesenheiten: [] }, person));
+      } else {
+        this.personen[index] = person;
+      }
     },
     deletePerson(person) {
       this.personen = this.personen.filter(item => item !== person);
@@ -224,7 +232,6 @@ export default {
         : '';
     },
     openModal(component, props, events) {
-      console.log('openModal', props, events);
       this.$buefy.modal.open({
         parent: this,
         component,
@@ -234,13 +241,21 @@ export default {
       });
     },
     openAddPersonModal(person) {
-      this.openModal(AddPersonModal, { person }, { save: this.addPerson });
+      this.openModal(AddPersonModal, {
+        person,
+        index: this.personen.indexOf(person),
+      }, {
+        save: this.addPerson
+      });
     },
     openAddAbwesenheitModal(person, abwesenheit) {
       this.openModal(AddAbwesenheitModal, {
         person,
         abwesenheit,
-      }, { save: this.addAbwesenheit });
+        index: person.abwesenheiten.indexOf(abwesenheit),
+      }, {
+        save: this.addAbwesenheit
+      });
     },
     openDeletePersonModal(person) {
       this.openModal(DeletePersonModal, { person }, { save: this.deletePerson });
@@ -249,7 +264,9 @@ export default {
       this.openModal(DeleteAbwesenheitModal, {
         person,
         abwesenheit,
-      }, { save: this.deleteAbwesenheit });
+      }, {
+        save: this.deleteAbwesenheit
+      });
     },
   },
   mounted() {

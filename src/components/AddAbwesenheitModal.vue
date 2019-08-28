@@ -52,6 +52,10 @@ export default {
         art: 'krank',
       }),
     },
+    index: {
+      type: Number,
+      default: () => -1,
+    },
   },
   data() {
     return {
@@ -86,12 +90,11 @@ export default {
       this.$emit('save', this.person, Object.assign({}, this.abwesenheit, {
         von: lightFormat(this.zeitraum[0], 'yyyy-MM-dd'),
         bis: lightFormat(this.zeitraum[1], 'yyyy-MM-dd'),
-      }));
+      }), this.index);
       this.$parent.close();
     },
   },
   mounted() {
-    console.log(this.abwesenheit);
     if (this.abwesenheit && this.abwesenheit.von.length > 0 && this.abwesenheit.bis.length > 0) {
       this.zeitraum = [parseDate(this.abwesenheit.von), parseDate(this.abwesenheit.bis)];
     }
