@@ -28,6 +28,7 @@
         custom-detail-row
         default-sort="nachname"
         show-detail-icon
+        ref="table"
       >
         <template slot-scope="props">
           <b-table-column
@@ -188,6 +189,10 @@ export default {
         person.abwesenheiten.push(abwesenheit);
       } else {
         person.abwesenheiten[index] = abwesenheit;
+
+        // evil bad hack to let the table update the details rows
+        this.$refs.table.toggleDetails(person);
+        this.$refs.table.toggleDetails(person);
       }
     },
     addPerson(person, index) {
