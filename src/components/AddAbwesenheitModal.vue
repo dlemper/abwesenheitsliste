@@ -11,7 +11,14 @@
         </b-select>
       </b-field>
       <b-field label="Zeitraum">
-        <b-datepicker v-model="zeitraum" range inline required />
+        <b-datepicker
+          v-model="zeitraum"
+          :month-names="monthNames"
+          :day-names="dayNames"
+          range
+          inline
+          required
+        />
       </b-field>
     </section>
     <footer class="modal-card-foot">
@@ -45,14 +52,37 @@ export default {
   },
   data() {
     return {
-      zeitraum: [],
+      zeitraum: null,
+      dayNames: [
+        'So',
+        'Mo',
+        'Di',
+        'Mi',
+        'Do',
+        'Fr',
+        'Sa',
+      ],
+      monthNames: [
+        'Januar',
+        'Februar',
+        'März',
+        'April',
+        'Mai',
+        'Juni',
+        'Juli',
+        'August',
+        'September',
+        'Oktober',
+        'November',
+        'Dezember',
+      ],
     };
   },
   methods: {
     save() {
       this.$emit('save', this.person, Object.assign({}, this.abwesenheit, {
-        von: lightFormat(this.abwesenheit.von, 'yyyy-MM-dd'),
-        bis: lightFormat(this.abwesenheit.bis, 'yyyy-MM-dd'),
+        von: lightFormat(this.zeitraum[0], 'yyyy-MM-dd'),
+        bis: lightFormat(this.zeitraum[1], 'yyyy-MM-dd'),
       }));
     },
   },

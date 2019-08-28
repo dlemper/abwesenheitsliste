@@ -68,7 +68,7 @@
                 icon-left="plus"
                 size="is-small"
                 type="is-success"
-                @click="isAddPersonModalActive = true"
+                @click="openAddPersonModal()"
               />
             </template>
             <div class="buttons has-addons">
@@ -81,7 +81,7 @@
               <b-button
                 icon-left="pencil-alt"
                 size="is-small"
-                @click="isAddPersonModalActive = true"
+                @click="openAddPersonModal(props.row)"
               />
               <b-button
                 icon-left="plus"
@@ -124,9 +124,6 @@
         </template>
       </b-table>
     </div>
-    <b-modal :active="isAddPersonModalActive" has-modal-card>
-      <add-person-modal @save="addPerson" @close="isAddPersonModalActive = false" />
-    </b-modal>
     <b-modal :active="isAddAbwModalActive" has-modal-card>
       <add-abwesenheit-modal @save="addAbwesenheit" @close="isAddAbwModalActive = false" />
     </b-modal>
@@ -156,7 +153,6 @@ const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 export default {
   name: 'app',
   components: {
-    AddPersonModal,
     AddAbwesenheitModal,
     DeletePersonModal,
     DeleteAbwesenheitModal,
@@ -164,7 +160,6 @@ export default {
   data() {
     return {
       files: {},
-      isAddPersonModalActive: false,
       isAddAbwModalActive: false,
       isDeleteAbwModalActive: false,
       isDeletePersonModalActive: false,
@@ -208,13 +203,15 @@ export default {
       this.isAddAbwModalActive = false;
     },
     addPerson(person) {
+      console.log('addPerson', person);
       this.personen.push(Object.assign({ abwesenheiten: [] }, person));
-      this.isAddPersonModalActive = false;
     },
     deletePerson(person) {
+      this.personen = this.personen.filter(item => item !== person);
       this.isDeletePersonModalActive = false;
     },
     deleteAbwesenheit(person, abwesenheit) {
+      person.abwesenheiten = person.abwesenheiten.filter(item => item !== abwesenheit); // eslint-disable-line no-param-reassign, max-len
       this.isDeleteAbwModalActive = false;
     },
     anzahlAbwesenheitstage(abwesenheiten) {
@@ -244,6 +241,20 @@ export default {
               .length,
           0)
         : '';
+    },
+    openModal(component, props, events) {
+      console.log('openModal', props, events);
+      this.$buefy.modal.open({
+        parent: this,
+        component,
+        hasModalCard: true,
+        props,
+        events,
+      });
+    },
+    openAddPersonModal(person) {
+      console.log('openAddPersonModal', person);
+      this.openModal(AddPersonModal, { person }, { save: this.addPerson });
     },
   },
   mounted() {
