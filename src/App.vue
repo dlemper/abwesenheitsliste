@@ -159,7 +159,13 @@ export default {
       neueAbwesenheit: { art: 'krank' },
       bundesland: 'NI',
       feiertage: [],
-      personen: [],
+      personen: [
+        {
+          vorname: '',
+          nachname: '',
+          abwesenheiten: [],
+        },
+      ],
     };
   },
   methods: {
@@ -282,6 +288,10 @@ export default {
     },
   },
   mounted() {
+    // evil bad hack: if we initialize the table with data, columns get displayed
+    //    and then we clear the table data
+    this.personen = [];
+
     const currentYear = (new Date()).getFullYear();
 
     Promise.all(
