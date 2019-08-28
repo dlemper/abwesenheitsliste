@@ -59,9 +59,7 @@
             {{ anzahlKrankMitKind(props.row.abwesenheiten) }}
           </b-table-column>
 
-          <b-table-column
-            sortable
-          >
+          <b-table-column>
             <template slot="header">
               <b-button
                 class="is-add-btn"
@@ -76,7 +74,7 @@
                 icon-left="trash-alt"
                 size="is-small"
                 type="is-danger"
-                @click="isDeletePersonModalActive = true"
+                @click="openDeletePersonModal(props.row)"
               />
               <b-button
                 icon-left="pencil-alt"
@@ -87,7 +85,7 @@
                 icon-left="plus"
                 size="is-small"
                 type="is-success"
-                @click="isAddAbwModalActive = true"
+                @click="openAddAbwesenheitModal(props.row)"
               />
             </div>
           </b-table-column>
@@ -115,24 +113,19 @@
                   icon-left="trash-alt"
                   size="is-small"
                   type="is-danger"
-                  @click="isDeleteAbwModalActive = true"
+                  @click="openDeleteAbwesenheitModal(props.row, item)"
                 />
-                <b-button icon-left="pencil-alt" size="is-small" />
+                <b-button
+                  icon-left="pencil-alt"
+                  size="is-small"
+                  @click="openAddAbwesenheitModal(props.row, item)"
+                />
               </div>
             </td>
           </tr>
         </template>
       </b-table>
     </div>
-    <b-modal :active="isAddAbwModalActive" has-modal-card>
-      <add-abwesenheit-modal @save="addAbwesenheit" @close="isAddAbwModalActive = false" />
-    </b-modal>
-    <b-modal :active="isDeletePersonModalActive" has-modal-card>
-      <delete-person-modal @save="deletePerson" @close="isDeletePersonModalActive = false" />
-    </b-modal>
-    <b-modal :active="isDeleteAbwModalActive" has-modal-card>
-      <delete-abwesenheit-modal @save="deleteAbwesenheit" @close="isDeleteAbwModalActive = false" />
-    </b-modal>
   </div>
 </template>
 
@@ -152,17 +145,9 @@ const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'app',
-  components: {
-    AddAbwesenheitModal,
-    DeletePersonModal,
-    DeleteAbwesenheitModal,
-  },
   data() {
     return {
       files: {},
-      isAddAbwModalActive: false,
-      isDeleteAbwModalActive: false,
-      isDeletePersonModalActive: false,
       neueAbwesenheit: { art: 'krank' },
       bundesland: 'NI',
       feiertage: [],
@@ -200,19 +185,15 @@ export default {
   methods: {
     addAbwesenheit(person, abwesenheit) {
       person.abwesenheiten.push(abwesenheit);
-      this.isAddAbwModalActive = false;
     },
-    addPerson(person) {
-      console.log('addPerson', person);
+    addPerson(person) { // "old values??"
       this.personen.push(Object.assign({ abwesenheiten: [] }, person));
     },
     deletePerson(person) {
       this.personen = this.personen.filter(item => item !== person);
-      this.isDeletePersonModalActive = false;
     },
     deleteAbwesenheit(person, abwesenheit) {
       person.abwesenheiten = person.abwesenheiten.filter(item => item !== abwesenheit); // eslint-disable-line no-param-reassign, max-len
-      this.isDeleteAbwModalActive = false;
     },
     anzahlAbwesenheitstage(abwesenheiten) {
       return abwesenheiten
@@ -253,8 +234,22 @@ export default {
       });
     },
     openAddPersonModal(person) {
-      console.log('openAddPersonModal', person);
       this.openModal(AddPersonModal, { person }, { save: this.addPerson });
+    },
+    openAddAbwesenheitModal(person, abwesenheit) {
+      this.openModal(AddAbwesenheitModal, {
+        person,
+        abwesenheit,
+      }, { save: this.addAbwesenheit });
+    },
+    openDeletePersonModal(person) {
+      this.openModal(DeletePersonModal, { person }, { save: this.deletePerson });
+    },
+    openDeleteAbwesenheitModal(person, abwesenheit) {
+      this.openModal(DeleteAbwesenheitModal, {
+        person,
+        abwesenheit,
+      }, { save: this.deleteAbwesenheit });
     },
   },
   mounted() {

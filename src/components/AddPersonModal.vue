@@ -44,3 +44,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.modal-card-foot{
+  justify-content: end;
+}
+</style>

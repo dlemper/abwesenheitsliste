@@ -22,7 +22,7 @@
       </b-field>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" type="button" @click="$emit('close')">
+      <button class="button" type="button" @click="$parent.close()">
         Abbrechen
       </button>
       <button class="button is-primary" @click="save()">
@@ -35,7 +35,10 @@
 <script>
 import {
   lightFormat,
+  parse,
 } from 'date-fns';
+
+const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'add-abwesenheit-modal',
@@ -84,7 +87,20 @@ export default {
         von: lightFormat(this.zeitraum[0], 'yyyy-MM-dd'),
         bis: lightFormat(this.zeitraum[1], 'yyyy-MM-dd'),
       }));
+      this.$parent.close();
     },
+  },
+  mounted() {
+    console.log(this.abwesenheit);
+    if (this.abwesenheit && this.abwesenheit.von.length > 0 && this.abwesenheit.bis.length > 0) {
+      this.zeitraum = [parseDate(this.abwesenheit.von), parseDate(this.abwesenheit.bis)];
+    }
   },
 };
 </script>
+
+<style scoped>
+.modal-card-foot{
+  justify-content: end;
+}
+</style>
