@@ -18,9 +18,14 @@
         <b-navbar-item tag="div">
           <div class="buttons">
             <b-upload v-model="files">
-              <b-button type="is-light">Upload</b-button>
+              <a class="button is-light">
+                <b-icon icon="upload" size="is-small" />
+                <span>Upload</span>
+              </a>
             </b-upload>
-            <b-button type="is-light">Download</b-button>
+            <b-button type="is-light" icon-left="download" @click="downloadData()">
+              Download
+            </b-button>
           </div>
         </b-navbar-item>
       </template>
@@ -285,6 +290,15 @@ export default {
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
+    },
+    downloadData() {
+      this.downloadDataAsFile(
+        `Abwesenheitsliste-${lightFormat(new Date(), 'yyyy-MM-dd')}.json`,
+        JSON.stringify({
+          bundesland: this.bundesland,
+          personen: this.personen,
+        }),
+      );
     },
   },
   mounted() {
