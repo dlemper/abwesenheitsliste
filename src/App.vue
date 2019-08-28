@@ -188,7 +188,7 @@ export default {
       if (index === -1) {
         person.abwesenheiten.push(abwesenheit);
       } else {
-        person.abwesenheiten[index] = abwesenheit;
+        person.abwesenheiten[index] = abwesenheit; // eslint-disable-line no-param-reassign
 
         // evil bad hack to let the table update the details rows
         this.$refs.table.toggleDetails(person);
@@ -250,7 +250,7 @@ export default {
         person,
         index: this.personen.indexOf(person),
       }, {
-        save: this.addPerson
+        save: this.addPerson,
       });
     },
     openAddAbwesenheitModal(person, abwesenheit) {
@@ -259,7 +259,7 @@ export default {
         abwesenheit,
         index: person.abwesenheiten.indexOf(abwesenheit),
       }, {
-        save: this.addAbwesenheit
+        save: this.addAbwesenheit,
       });
     },
     openDeletePersonModal(person) {
@@ -270,7 +270,7 @@ export default {
         person,
         abwesenheit,
       }, {
-        save: this.deleteAbwesenheit
+        save: this.deleteAbwesenheit,
       });
     },
   },
