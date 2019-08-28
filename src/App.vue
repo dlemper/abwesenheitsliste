@@ -2,7 +2,9 @@
   <div id="app">
     <b-navbar type="is-info">
       <template slot="brand">
-        <b-navbar-item href="/">Abwesenheitsliste</b-navbar-item>
+        <b-navbar-item tag="div" class="is-size-5 has-text-weight-bold">
+          Abwesenheitsliste
+        </b-navbar-item>
       </template>
       <!--<template slot="start">
         <b-navbar-item href="#">Home</b-navbar-item>
@@ -10,6 +12,9 @@
       </template>-->
 
       <template slot="end">
+        <b-navbar-item tag="div">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Coat_of_arms_of_Lower_Saxony.svg/26px-Coat_of_arms_of_Lower_Saxony.svg.png">
+        </b-navbar-item>
         <b-navbar-item tag="div">
           <div class="buttons">
             <b-upload v-model="files">
@@ -272,6 +277,14 @@ export default {
       }, {
         save: this.deleteAbwesenheit,
       });
+    },
+    downloadDataAsFile(filename, data) { // from https://codepen.io/nigamshirish/pen/ZMpvRa
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
     },
   },
   mounted() {
