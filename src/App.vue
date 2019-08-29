@@ -1,38 +1,6 @@
 <template>
   <div id="app">
-    <b-navbar type="is-info">
-      <template slot="brand">
-        <b-navbar-item tag="div" class="is-size-5 has-text-weight-bold">
-          Abwesenheitsliste
-        </b-navbar-item>
-      </template>
-      <!--<template slot="start">
-        <b-navbar-item href="#">Home</b-navbar-item>
-        <b-navbar-item href="#">Documentation</b-navbar-item>
-      </template>-->
-
-      <template slot="end">
-        <b-navbar-item href="https://github.com/dlemper/abwesenheitsliste">
-          <b-icon pack="fab" icon="github" />
-        </b-navbar-item>
-        <b-navbar-item tag="div">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Coat_of_arms_of_Lower_Saxony.svg/26px-Coat_of_arms_of_Lower_Saxony.svg.png">
-        </b-navbar-item>
-        <b-navbar-item tag="div">
-          <div class="buttons">
-            <b-upload @input="upload">
-              <a class="button is-light">
-                <b-icon icon="upload" size="is-small" />
-                <span>Upload</span>
-              </a>
-            </b-upload>
-            <b-button type="is-light" icon-left="download" @click="downloadData()">
-              Download
-            </b-button>
-          </div>
-        </b-navbar-item>
-      </template>
-    </b-navbar>
+    <nav-bar @download="downloadData()" @upload="upload"/>
     <div id="container is-fluid">
       <b-table
         :data="personen"
@@ -145,6 +113,7 @@ import {
   lightFormat,
   isWeekend,
 } from 'date-fns';
+import NavBar from './components/NavBar.vue';
 import AddPersonModal from './components/AddPersonModal.vue';
 import AddAbwesenheitModal from './components/AddAbwesenheitModal.vue';
 import DeletePersonModal from './components/DeletePersonModal.vue';
@@ -154,6 +123,9 @@ const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'app',
+  components: {
+    NavBar,
+  },
   data() {
     return {
       neueAbwesenheit: { art: 'krank' },
