@@ -279,7 +279,7 @@ export default {
           }
         });
       })
-      .catch(console.error);
+      .catch(console.error); // eslint-disable-line no-console
   },
   filters: {
     date(value) {
