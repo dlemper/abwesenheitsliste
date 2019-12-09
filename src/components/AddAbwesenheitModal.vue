@@ -38,7 +38,7 @@ import {
   parse,
 } from 'date-fns';
 
-const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
+const parseDate = (date) => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'add-abwesenheit-modal',
@@ -87,10 +87,11 @@ export default {
   },
   methods: {
     save() {
-      this.$emit('save', this.person, Object.assign({}, this.abwesenheit, {
+      this.$emit('save', this.person, {
+        ...this.abwesenheit,
         von: lightFormat(this.zeitraum[0], 'yyyy-MM-dd'),
         bis: lightFormat(this.zeitraum[1], 'yyyy-MM-dd'),
-      }), this.index);
+      }, this.index);
       this.$parent.close();
     },
   },

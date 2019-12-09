@@ -25,7 +25,7 @@ import {
   parse,
 } from 'date-fns';
 
-const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
+const parseDate = (date) => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'delete-abwesenheit-modal',
