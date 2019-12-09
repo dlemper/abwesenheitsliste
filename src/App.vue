@@ -119,7 +119,7 @@ import AddAbwesenheitModal from './components/AddAbwesenheitModal.vue';
 import DeletePersonModal from './components/DeletePersonModal.vue';
 import DeleteAbwesenheitModal from './components/DeleteAbwesenheitModal.vue';
 
-const parseDate = date => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
+const parseDate = (date) => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'app',
@@ -154,41 +154,41 @@ export default {
     },
     addPerson(person, index) {
       if (index === -1) {
-        this.personen.push(Object.assign({ abwesenheiten: [] }, person));
+        this.personen.push({ abwesenheiten: [], ...person });
       } else {
         this.personen[index] = person;
       }
     },
     deletePerson(person) {
-      this.personen = this.personen.filter(item => item !== person);
+      this.personen = this.personen.filter((item) => item !== person);
     },
     deleteAbwesenheit(person, abwesenheit) {
-      person.abwesenheiten = person.abwesenheiten.filter(item => item !== abwesenheit); // eslint-disable-line no-param-reassign, max-len
+      person.abwesenheiten = person.abwesenheiten.filter((item) => item !== abwesenheit); // eslint-disable-line no-param-reassign, max-len
     },
     anzahlAbwesenheitstage(abwesenheiten) {
       return abwesenheiten
-        .filter(item => item.art === 'krank')
+        .filter((item) => item.art === 'krank')
         .reduce((acc, item) => acc
           + eachDayOfInterval({
             start: parseDate(item.von),
             end: parseDate(item.bis),
           })
-            .filter(day => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
-            .filter(day => !isWeekend(day))
+            .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
+            .filter((day) => !isWeekend(day))
             .length,
         0);
     },
     anzahlKrankMitKind(abwesenheiten) {
       return this.feiertage.length > 0
         ? abwesenheiten
-          .filter(item => item.art === 'krankMitKind')
+          .filter((item) => item.art === 'krankMitKind')
           .reduce((acc, item) => acc
             + eachDayOfInterval({
               start: parseDate(item.von),
               end: parseDate(item.bis),
             })
-              .filter(day => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
-              .filter(day => !isWeekend(day))
+              .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
+              .filter((day) => !isWeekend(day))
               .length,
           0)
         : '';
@@ -268,14 +268,14 @@ export default {
 
     Promise.all(
       [currentYear - 1, currentYear, currentYear + 1]
-        .map(year => fetch(`https://feiertage-api.de/api/?jahr=${year}&nur_land=${this.bundesland}`)),
+        .map((year) => fetch(`https://feiertage-api.de/api/?jahr=${year}&nur_land=${this.bundesland}`)),
     )
       .then((years) => {
         years.forEach(async (year) => {
           if (year.ok) {
             const tage = await year.json();
 
-            this.feiertage.push(...Object.values(tage).map(tag => tag.datum));
+            this.feiertage.push(...Object.values(tage).map((tag) => tag.datum));
           }
         });
       })
