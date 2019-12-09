@@ -13,10 +13,17 @@
       <b-field label="Zeitraum">
         <b-datepicker
           v-model="zeitraum"
+          inline
+          :unselectable-days-of-week="[0, 6]"
+          :first-day-of-week="1"
+          indicators="bars"
+          :events="events"
+          :mobile-native="false"
           :month-names="monthNames"
           :day-names="dayNames"
+          :min-date="minDate"
+          :max-date="maxDate"
           range
-          inline
           required
         />
       </b-field>
@@ -33,9 +40,11 @@
 </template>
 
 <script>
+import locale from 'date-fns/esm/locale/de';
 import {
   lightFormat,
   parse,
+  lastDayOfYear,
 } from 'date-fns';
 
 const parseDate = (date) => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
@@ -56,34 +65,41 @@ export default {
       type: Number,
       default: () => -1,
     },
+    feiertage: Array,
   },
   data() {
     return {
       zeitraum: null,
-      dayNames: [
-        'So',
-        'Mo',
-        'Di',
-        'Mi',
-        'Do',
-        'Fr',
-        'Sa',
-      ],
-      monthNames: [
-        'Januar',
-        'Februar',
-        'März',
-        'April',
-        'Mai',
-        'Juni',
-        'Juli',
-        'August',
-        'September',
-        'Oktober',
-        'November',
-        'Dezember',
-      ],
+      // ferien: [],
+      bundesland: 'NI',
     };
+  },
+  computed: {
+    years() {
+      const currentYear = new Date().getFullYear();
+
+      return [currentYear - 1, currentYear, currentYear + 1];
+    },
+    events() {
+      // return [...this.feiertage, ...this.ferien];
+      return this.feiertage;
+    },
+    monthNames() {
+      return [...Array(12).keys()].map((i) => locale.localize.month(i, { width: 'wide' }));
+    },
+    dayNames() {
+      return [...Array(7).keys()]
+        .map((i) => locale.localize.day(i, { width: 'abbreviated' }))
+        .map((n) => n.replace('.', ''));
+    },
+    minDate() {
+      return this.years.length > 0 ? new Date(this.years[0], 0) : undefined;
+    },
+    maxDate() {
+      return this.years.length > 0
+        ? lastDayOfYear(new Date(this.years[this.years.length - 1], 0))
+        : undefined;
+    },
   },
   methods: {
     save() {

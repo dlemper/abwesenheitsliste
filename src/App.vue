@@ -109,17 +109,15 @@
 <script>
 import {
   eachDayOfInterval,
-  parse,
   lightFormat,
   isWeekend,
+  parseISO,
 } from 'date-fns';
 import NavBar from './components/NavBar.vue';
 import AddPersonModal from './components/AddPersonModal.vue';
 import AddAbwesenheitModal from './components/AddAbwesenheitModal.vue';
 import DeletePersonModal from './components/DeletePersonModal.vue';
 import DeleteAbwesenheitModal from './components/DeleteAbwesenheitModal.vue';
-
-const parseDate = (date) => parse(`${date}Z`, 'yyyy-MM-ddX', new Date());
 
 export default {
   name: 'app',
@@ -139,6 +137,13 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    years() {
+      const currentYear = new Date().getFullYear();
+
+      return [currentYear - 1, currentYear, currentYear + 1];
+    },
   },
   methods: {
     addAbwesenheit(person, abwesenheit, index) {
@@ -170,8 +175,8 @@ export default {
         .filter((item) => item.art === 'krank')
         .reduce((acc, item) => acc
           + eachDayOfInterval({
-            start: parseDate(item.von),
-            end: parseDate(item.bis),
+            start: parseISO(item.von),
+            end: parseISO(item.bis),
           })
             .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
             .filter((day) => !isWeekend(day))
@@ -184,8 +189,8 @@ export default {
           .filter((item) => item.art === 'krankMitKind')
           .reduce((acc, item) => acc
             + eachDayOfInterval({
-              start: parseDate(item.von),
-              end: parseDate(item.bis),
+              start: parseISO(item.von),
+              end: parseISO(item.bis),
             })
               .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
               .filter((day) => !isWeekend(day))
@@ -215,6 +220,7 @@ export default {
         person,
         abwesenheit,
         index: person.abwesenheiten.indexOf(abwesenheit),
+        feiertage: this.feiertage,
       }, {
         save: this.addAbwesenheit,
       });
@@ -264,18 +270,18 @@ export default {
     //    and then we clear the table data
     this.personen = [];
 
-    const currentYear = (new Date()).getFullYear();
-
     Promise.all(
-      [currentYear - 1, currentYear, currentYear + 1]
-        .map((year) => fetch(`https://feiertage-api.de/api/?jahr=${year}&nur_land=${this.bundesland}`)),
+      this.years.map((year) => fetch(
+        `https://feiertage-api.de/api/?jahr=${year}&nur_land=${this.bundesland}`,
+      )),
     )
       .then((years) => {
         years.forEach(async (year) => {
           if (year.ok) {
             const tage = await year.json();
-
-            this.feiertage.push(...Object.values(tage).map((tag) => tag.datum));
+            this.feiertage.push(
+              ...Object.values(tage).map((tag) => parseISO(tag.datum)),
+            );
           }
         });
       })
@@ -290,7 +296,7 @@ export default {
             month: '2-digit',
             day: '2-digit',
           })
-          .format(parseDate(value))
+          .format(parseISO(value))
         : '';
     },
   },
