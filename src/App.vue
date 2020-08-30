@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav-bar @download="downloadData()" @upload="upload"/>
+    <nav-bar @download="downloadData()" @upload="upload" />
     <div id="container is-fluid">
       <b-table
         :data="personen"
@@ -11,33 +11,41 @@
         show-detail-icon
         ref="table"
       >
-        <template slot-scope="props">
-          <b-table-column field="nachname" label="Nachname" sortable>
-            <template>{{ props.row.nachname }}</template>
-          </b-table-column>
+        <b-table-column field="nachname" label="Nachname" sortable v-slot="props">
+          <template>{{ props.row.nachname }}</template>
+        </b-table-column>
 
-          <b-table-column field="vorname" label="Vorname" sortable>
-            {{ props.row.vorname }}
-          </b-table-column>
+        <b-table-column field="vorname" label="Vorname" sortable v-slot="props">
+          {{
+          props.row.vorname
+          }}
+        </b-table-column>
 
-          <b-table-column label="Krank" numeric centered>
-            {{ anzahlAbwesenheitstage(props.row.abwesenheiten) }}
-          </b-table-column>
+        <b-table-column
+          label="Krank"
+          numeric
+          centered
+          v-slot="props"
+        >{{ anzahlAbwesenheitstage(props.row.abwesenheiten) }}</b-table-column>
 
-          <b-table-column label="Krank mit Kind" numeric centered>
-            {{ anzahlKrankMitKind(props.row.abwesenheiten) }}
-          </b-table-column>
+        <b-table-column
+          label="Krank mit Kind"
+          numeric
+          centered
+          v-slot="props"
+        >{{ anzahlKrankMitKind(props.row.abwesenheiten) }}</b-table-column>
 
-          <b-table-column>
-            <template slot="header">
-              <b-button
-                class="is-add-btn"
-                icon-left="plus"
-                size="is-small"
-                type="is-success"
-                @click="openAddPersonModal()"
-              />
-            </template>
+        <b-table-column>
+          <template v-slot:header>
+            <b-button
+              class="is-add-btn"
+              icon-left="plus"
+              size="is-small"
+              type="is-success"
+              @click="openAddPersonModal()"
+            />
+          </template>
+          <template v-slot:default="props">
             <div class="buttons has-addons">
               <b-button
                 icon-left="trash-alt"
@@ -57,25 +65,20 @@
                 @click="openAddAbwesenheitModal(props.row)"
               />
             </div>
-          </b-table-column>
-        </template>
+          </template>
+        </b-table-column>
 
         <template slot="detail" slot-scope="props">
           <tr
             v-for="(item, index) in props.row.abwesenheiten"
-            :key="index" class="has-background-light"
+            :key="index"
+            class="has-background-light"
           >
             <td></td>
             <td></td>
-            <td>
-              {{ item.art === 'krank' ? 'Krank' : 'Krank mit Kind' }}
-            </td>
-            <td class="has-text-centered">
-              {{ item.von | date}}
-            </td>
-            <td class="has-text-centered">
-              {{ item.bis | date }}
-            </td>
+            <td>{{ item.art === "krank" ? "Krank" : "Krank mit Kind" }}</td>
+            <td class="has-text-centered">{{ item.von | date }}</td>
+            <td class="has-text-centered">{{ item.bis | date }}</td>
             <td>
               <div class="buttons has-addons">
                 <b-button
@@ -108,10 +111,7 @@
 
 <script>
 import {
-  eachDayOfInterval,
-  lightFormat,
-  isWeekend,
-  parseISO,
+  eachDayOfInterval, lightFormat, isWeekend, parseISO,
 } from 'date-fns';
 import NavBar from './components/NavBar.vue';
 import AddPersonModal from './components/AddPersonModal.vue';
@@ -168,34 +168,43 @@ export default {
       this.personen = this.personen.filter((item) => item !== person);
     },
     deleteAbwesenheit(person, abwesenheit) {
-      person.abwesenheiten = person.abwesenheiten.filter((item) => item !== abwesenheit); // eslint-disable-line no-param-reassign, max-len
+      // eslint-disable-next-line no-param-reassign
+      person.abwesenheiten = person.abwesenheiten.filter(
+        (item) => item !== abwesenheit,
+      );
     },
     anzahlAbwesenheitstage(abwesenheiten) {
       return abwesenheiten
         .filter((item) => item.art === 'krank')
-        .reduce((acc, item) => acc
-          + eachDayOfInterval({
-            start: parseISO(item.von),
-            end: parseISO(item.bis),
-          })
-            .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
-            .filter((day) => !isWeekend(day))
-            .length,
-        0);
+        .reduce(
+          (acc, item) => acc
+            + eachDayOfInterval({
+              start: parseISO(item.von),
+              end: parseISO(item.bis),
+            })
+              .filter(
+                (day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')),
+              )
+              .filter((day) => !isWeekend(day)).length,
+          0,
+        );
     },
     anzahlKrankMitKind(abwesenheiten) {
       return this.feiertage.length > 0
         ? abwesenheiten
           .filter((item) => item.art === 'krankMitKind')
-          .reduce((acc, item) => acc
-            + eachDayOfInterval({
-              start: parseISO(item.von),
-              end: parseISO(item.bis),
-            })
-              .filter((day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')))
-              .filter((day) => !isWeekend(day))
-              .length,
-          0)
+          .reduce(
+            (acc, item) => acc
+                + eachDayOfInterval({
+                  start: parseISO(item.von),
+                  end: parseISO(item.bis),
+                })
+                  .filter(
+                    (day) => !this.feiertage.includes(lightFormat(day, 'yyyy-MM-dd')),
+                  )
+                  .filter((day) => !isWeekend(day)).length,
+            0,
+          )
         : '';
     },
     openModal(component, props, events) {
@@ -208,35 +217,52 @@ export default {
       });
     },
     openAddPersonModal(person) {
-      this.openModal(AddPersonModal, {
-        person,
-        index: this.personen.indexOf(person),
-      }, {
-        save: this.addPerson,
-      });
+      this.openModal(
+        AddPersonModal,
+        {
+          person,
+          index: this.personen.indexOf(person),
+        },
+        {
+          save: this.addPerson,
+        },
+      );
     },
     openAddAbwesenheitModal(person, abwesenheit) {
-      this.openModal(AddAbwesenheitModal, {
-        person,
-        abwesenheit,
-        index: person.abwesenheiten.indexOf(abwesenheit),
-        feiertage: this.feiertage,
-      }, {
-        save: this.addAbwesenheit,
-      });
+      this.openModal(
+        AddAbwesenheitModal,
+        {
+          person,
+          abwesenheit,
+          index: person.abwesenheiten.indexOf(abwesenheit),
+          feiertage: this.feiertage,
+        },
+        {
+          save: this.addAbwesenheit,
+        },
+      );
     },
     openDeletePersonModal(person) {
-      this.openModal(DeletePersonModal, { person }, { save: this.deletePerson });
+      this.openModal(
+        DeletePersonModal,
+        { person },
+        { save: this.deletePerson },
+      );
     },
     openDeleteAbwesenheitModal(person, abwesenheit) {
-      this.openModal(DeleteAbwesenheitModal, {
-        person,
-        abwesenheit,
-      }, {
-        save: this.deleteAbwesenheit,
-      });
+      this.openModal(
+        DeleteAbwesenheitModal,
+        {
+          person,
+          abwesenheit,
+        },
+        {
+          save: this.deleteAbwesenheit,
+        },
+      );
     },
-    downloadDataAsFile(filename, data) { // from https://codepen.io/nigamshirish/pen/ZMpvRa
+    downloadDataAsFile(filename, data) {
+      // from https://codepen.io/nigamshirish/pen/ZMpvRa
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement('a');
       link.href = url;
@@ -290,13 +316,11 @@ export default {
   filters: {
     date(value) {
       return value
-        ? Intl
-          .DateTimeFormat(window.navigator.language, {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          })
-          .format(parseISO(value))
+        ? Intl.DateTimeFormat(window.navigator.language, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(parseISO(value))
         : '';
     },
   },
